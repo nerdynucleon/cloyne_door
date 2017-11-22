@@ -27,9 +27,6 @@ GPIO.setwarnings(False)
 GPIO.setup(optoisolator_pin, GPIO.OUT) # OptoIsolator pin set as output
 GPIO.output(optoisolator_pin, GPIO.LOW)# Initial state for Optoisolator : closed
 
-# Initialize Serial Connection with HID KeyCard Reader
-HID = serial.Serial('/dev/ttyUSB0') # Open port at 9600,8,N,1, no timeout:
-
 def open_door():
 	# Turn optoisolator on
 	print 'Opening Door!'
@@ -50,9 +47,27 @@ def valid_ID(id_num):
 	datetime.datetime.now() # check if valid for this academic semester
 	return id_num > 0
 
+def HID_initialize():
+	HIDinitialized = False
+	while(not HIDinitialized):
+		try:
+			HID = serial.Serial('/dev/ttyUSB0') # Open port at 9600,8,N,1, no timeout:
+			return HID
+		except:
+			print 'Could not connect to HID CalID rfid reader'
+			logging.info('Failed to Initialize HID serial connection')
+			time.sleep(5)
+	
+# Initialize Serial Connection with HID KeyCard Reader
+HID = HID_initialize()
+	
 def main():
 	while(1):
-		hex_string = HID.readline()
+		try:
+			hex_string = HID.readline()
+		except:
+			HID = HID_initialize()
+			continue
 		id_num = calculate_id(hex_string)
 		if( valid_ID(id_num)):
 			open_door()
