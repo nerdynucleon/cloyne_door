@@ -27,6 +27,10 @@ GPIO.setwarnings(False)
 GPIO.setup(optoisolator_pin, GPIO.OUT) # OptoIsolator pin set as output
 GPIO.output(optoisolator_pin, GPIO.LOW)# Initial state for Optoisolator : closed
 
+#Plaintext IDs
+# XXX REDACTED
+VALID_IDS = []
+
 def open_door():
 	# Turn optoisolator on
 	print 'Opening Door!'
@@ -44,8 +48,15 @@ def calculate_id(hex_string):
 
 def valid_ID(id_num):
 	# TO DO CREATE DATABASE TO CHECK
+
+	# Iterate over ID numbers
+	access_granted = False
+	for id_valid in VALID_IDS:
+		if (id_num == id_valid):
+			access_granted = True
+			break
 	datetime.datetime.now() # check if valid for this academic semester
-	return id_num > 0
+	return access_granted
 
 def HID_initialize():
 	HIDinitialized = False
